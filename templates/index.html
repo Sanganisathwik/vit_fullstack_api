@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BFHL API Tester</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; color: #111; }
+    h1 { margin: 0 0 16px; font-size: 24px; }
+    .card { max-width: 800px; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    label { display: block; margin: 8px 0 6px; font-weight: 600; }
+    textarea, input[type="text"] { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    button { background: #111827; color: white; border: 0; padding: 10px 14px; border-radius: 8px; cursor: pointer; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .row { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .muted { color: #6b7280; font-size: 12px; }
+    pre { background: #0b1020; color: #e5e7eb; padding: 12px; border-radius: 8px; overflow: auto; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #f3f4f6; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>BFHL API Tester <span class="pill">/bfhl</span></h1>
+  <div class="card">
+    <div class="row">
+      <div>
+        <label for="data">Input JSON Array</label>
+        <textarea id="data" rows="6">["a","1","334","4","R","$"]</textarea>
+        <div class="muted">Enter a JSON array of strings. Example: ["2","a","y","4","&","-","*","5","92","b"]</div>
+      </div>
+      <div class="grid">
+        <div>
+          <label for="endpoint">Endpoint</label>
+          <input id="endpoint" type="text" value="/bfhl" />
+        </div>
+        <div style="align-self:end;">
+          <button id="send">Send POST</button>
+        </div>
+      </div>
+      <div>
+        <label>Response</label>
+        <pre id="response"><code>// Response will appear here</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const btn = document.getElementById('send');
+    const dataEl = document.getElementById('data');
+    const endpointEl = document.getElementById('endpoint');
+    const respEl = document.getElementById('response').firstElementChild;
+
+    function setResponse(obj) {
+      respEl.textContent = typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2);
+    }
+
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      setResponse('// Sending...');
+      try {
+        let arr;
+        try {
+          arr = JSON.parse(dataEl.value);
+          if (!Array.isArray(arr)) throw new Error('Input must be a JSON array');
+        } catch (e) {
+          setResponse('Invalid JSON. Please provide a JSON array.');
+          btn.disabled = false;
+          return;
+        }
+        const endpoint = endpointEl.value || '/bfhl';
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: arr })
+        });
+        const text = await res.text();
+        try {
+          const json = JSON.parse(text);
+          setResponse(json);
+        } catch {
+          setResponse(text);
+        }
+      } catch (err) {
+        setResponse({ error: String(err) });
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

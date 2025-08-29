@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import re
 from datetime import datetime
@@ -56,7 +56,6 @@ def process_array(data):
     
     # Create concatenated string with alternating caps in reverse order
     if all_alphabets:
-        # Reverse the list and create alternating caps
         reversed_alphabets = all_alphabets[::-1]
         concat_string = ""
         for i, char in enumerate(reversed_alphabets):
@@ -79,7 +78,6 @@ def process_array(data):
 @app.route("/bfhl", methods=["POST"])
 def bfhl():
     try:
-        # Get JSON data from request
         request_data = request.get_json()
         
         if not request_data or "data" not in request_data:
@@ -96,15 +94,13 @@ def bfhl():
                 "error": "'data' must be an array"
             }), 400
         
-        # Process the array
         result = process_array(data)
         
-        # Create response with user information
         response = {
             "is_success": True,
-            "user_id": "john_doe_17091999",  # Example user ID
-            "email": "john@xyz.com",  # Example email
-            "roll_number": "ABCD123",  # Example roll number
+            "user_id": "john_doe_17091999",
+            "email": "john@xyz.com",
+            "roll_number": "ABCD123",
             "odd_numbers": result["odd_numbers"],
             "even_numbers": result["even_numbers"],
             "alphabets": result["alphabets"],
@@ -123,12 +119,7 @@ def bfhl():
 
 @app.route("/", methods=["GET"])
 def home():
-    return jsonify({
-        "message": "BFHL API is running",
-        "endpoint": "/bfhl",
-        "method": "POST",
-        "description": "Process arrays and return categorized results"
-    })
+    return render_template("index.html")
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
