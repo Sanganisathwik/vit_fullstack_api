@@ -85,7 +85,7 @@ Processes an array and returns categorized results.
 
 ## Deployment
 
-The application is configured for deployment on platforms like Heroku, Railway, or Render with the provided `Procfile`.
+The application is configured for deployment on **Render** with the provided `render.yaml` and `Procfile`. See `DEPLOYMENT.md` for detailed deployment instructions.
 
 ## Technologies Used
 
